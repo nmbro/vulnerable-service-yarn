@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "dustjs-helpers": "1.4.0",
+    "dustjs-linkedin": "2.5.0",
+    "express": "^4.16.4"
+  },
+  "scripts": {
+    "start": "node ./app.js"
+  }
+}

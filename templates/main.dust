@@ -1,0 +1,6 @@
+{@if cond="'{device}' == 'desktop'"}
+  <div> Desktop version </div> 
+{:else}
+  <div>String: {device}</div>
+  <div> Mobile version </div>
+{/if} 
