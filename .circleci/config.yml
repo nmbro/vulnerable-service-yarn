@@ -32,3 +32,49 @@ jobs:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
+
+
+  release:
+    docker:
+      - image: circleci/node:11.7
+    working_directory: ~/repo
+    steps:
+      - setup_remote_docker
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+      - run: 
+         name: docker login
+         command: docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
+      - run: 
+          name: build docker 
+          command: docker build -t nicholasjackson/emojify-favorites:latest . 
+      - run:
+          name: tag docker
+          command: docker tag nicholasjackson/emojify-favorites:latest nicholasjackson/emojify-favorites:${CIRCLE_TAG}
+      
+      - run: 
+          name: push docker 
+          command: |
+            docker push nicholasjackson/emojify-favorites:latest
+            docker push nicholasjackson/emojify-favorites:${CIRCLE_TAG}
+
+workflows:
+  version: 2
+  build-and-release:
+    jobs:
+      - build:
+          filters:
+            tags:
+              only: /.*/
+      - release:
+          requires:
+            - build
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
